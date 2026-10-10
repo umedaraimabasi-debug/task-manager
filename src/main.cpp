@@ -1,3 +1,4 @@
+#include <fstream>
 #include <iostream>
 #include <limits>
 #include <string>
@@ -7,6 +8,29 @@ struct Task {
     std::string title;
     bool done = false;
 };
+
+const std::string FILE_NAME = "tasks.txt";
+
+void saveTasks(const std::vector<Task>& tasks) {
+    std::ofstream out(FILE_NAME);
+    for (const auto& t : tasks) {
+        out << (t.done ? 1 : 0) << ' ' << t.title << '\n';
+    }
+}
+
+std::vector<Task> loadTasks() {
+    std::vector<Task> tasks;
+    std::ifstream in(FILE_NAME);
+    int done;
+    while (in >> done) {
+        in.ignore();
+        Task t;
+        t.done = (done == 1);
+        std::getline(in, t.title);
+        tasks.push_back(t);
+    }
+    return tasks;
+}
 
 int readInt(const std::string& prompt) {
     int value;
@@ -32,7 +56,7 @@ void listTasks(const std::vector<Task>& tasks) {
 }
 
 int main() {
-    std::vector<Task> tasks;
+    std::vector<Task> tasks = loadTasks();
     int choice = 0;
 
     while (choice != 5) {
@@ -59,5 +83,6 @@ int main() {
                 tasks.erase(tasks.begin() + (n - 1));
             }
         }
+        saveTasks(tasks);
     }
 }
